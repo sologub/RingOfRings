@@ -74,7 +74,7 @@ public class RingOfRings<T>
         {
             while (running && !token.IsCancellationRequested)
             {
-                // Use an AutoResetEvent to lower CPU utilization.
+                // Wait for data to be imported
                 dataImportedEvent.Wait(token); // Wait for data to be imported
 
                 while (ring.Read(0, out var ev))
