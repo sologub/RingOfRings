@@ -19,7 +19,7 @@ This project is especially useful for scenarios involving multiple producers fee
 To include this project in your own .NET solution:
 1. Clone this repository:
    ```sh
-   git clone https://github.com/yourusername/RingOfRings.git
+   git clone https://github.com/sologub/RingOfRings.git
    ```
 2. Add the project to your solution in Visual Studio or any other IDE:
    - Open your existing solution.
