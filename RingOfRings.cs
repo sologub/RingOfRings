@@ -62,7 +62,6 @@ public class RingOfRings<T>
                 {
                     while (producer.Read(0, out var @event))
                     {
-
                         ring.SpinWrite(@event); // write to main ring
                     }
                 }
@@ -74,7 +73,6 @@ public class RingOfRings<T>
         {
             while (running && !token.IsCancellationRequested)
             {
-                // Wait for data to be imported
                 dataImportedEvent.Wait(token); // Wait for data to be imported
 
                 while (ring.Read(0, out var ev))
