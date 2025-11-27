@@ -1301,26 +1301,29 @@ public static class RingOfRingsTests
                 $"Consumer {c} received wrong count");
         }
 
-        // Verify ordering within each producer stream (for first consumer)
-        var firstConsumerItems = receivedByConsumer[0];
-        var byProducer = new Dictionary<int, List<int>>();
-        for (int p = 0; p < numProducers; p++) byProducer[p] = new List<int>();
-
-        foreach (var encoded in firstConsumerItems)
+        // Verify ordering within each producer stream for ALL consumers
+        for (int c = 0; c < numConsumers; c++)
         {
-            int producerId = (int)(encoded >> 32);
-            int seq = (int)(encoded & 0xFFFFFFFF);
-            byProducer[producerId].Add(seq);
-        }
+            var consumerItems = receivedByConsumer[c];
+            var byProducer = new Dictionary<int, List<int>>();
+            for (int p = 0; p < numProducers; p++) byProducer[p] = new List<int>();
 
-        foreach (var kvp in byProducer)
-        {
-            var seqs = kvp.Value;
-            for (int i = 1; i < seqs.Count; i++)
+            foreach (var encoded in consumerItems)
             {
-                if (seqs[i] <= seqs[i - 1])
+                int producerId = (int)(encoded >> 32);
+                int seq = (int)(encoded & 0xFFFFFFFF);
+                byProducer[producerId].Add(seq);
+            }
+
+            foreach (var kvp in byProducer)
+            {
+                var seqs = kvp.Value;
+                for (int i = 1; i < seqs.Count; i++)
                 {
-                    throw new Exception($"Producer {kvp.Key} ordering violated at consumer position {i}: {seqs[i-1]} -> {seqs[i]}");
+                    if (seqs[i] <= seqs[i - 1])
+                    {
+                        throw new Exception($"Consumer {c}, Producer {kvp.Key} ordering violated at position {i}: {seqs[i-1]} -> {seqs[i]}");
+                    }
                 }
             }
         }
