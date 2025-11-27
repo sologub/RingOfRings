@@ -1247,11 +1247,11 @@ public static class RingOfRingsTests
         using var cts = new CancellationTokenSource();
         ror.Start(cts.Token);
 
-        // Track received items per consumer
-        var receivedByConsumer = new ConcurrentDictionary<int, ConcurrentBag<long>>();
+        // Track received items per consumer (each consumer writes only to its own list)
+        var receivedByConsumer = new List<long>[numConsumers];
         for (int i = 0; i < numConsumers; i++)
         {
-            receivedByConsumer[i] = new ConcurrentBag<long>();
+            receivedByConsumer[i] = new List<long>();
         }
 
         var producerThreads = new Thread[numProducers];
@@ -1302,7 +1302,7 @@ public static class RingOfRingsTests
         }
 
         // Verify ordering within each producer stream (for first consumer)
-        var firstConsumerItems = receivedByConsumer[0].ToList();
+        var firstConsumerItems = receivedByConsumer[0];
         var byProducer = new Dictionary<int, List<int>>();
         for (int p = 0; p < numProducers; p++) byProducer[p] = new List<int>();
 
